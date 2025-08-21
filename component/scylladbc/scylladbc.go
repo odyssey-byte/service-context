@@ -84,6 +84,11 @@ func (s *scyllaDbComponent) Activate(ctx sctx.ServiceContext) error {
 	cluster.ConnectTimeout = s.config.connectTimeout
 	cluster.NumConns = s.config.ksNumConns
 
+	// Best Practice, use TokenAwareHostPolicy enhance performance
+	// because it routes requests to the replica that is most likely to have the data,
+	// reducing latency and improving throughput.
+	cluster.PoolConfig.HostSelectionPolicy = gocql.TokenAwareHostPolicy(gocql.RoundRobinHostPolicy())
+
 	// Disable initial host lookup, it helps with faster startup
 	cluster.DisableInitialHostLookup = s.config.ksDisableInitialHostLookup
 
